@@ -167,4 +167,119 @@ describe('/comments endpoint', () => {
       expect(responseJSON.data.addedComment).toBeDefined();
     });
   });
+
+  describe('when DELETE /threads/{threadId}/comments/{commentId}', () => {
+    it('should return 401 AuthorizationError when given invalid userId', async () => {
+      const userId = 'usr-123';
+      const threadId = 'thread-123';
+      const commentId = 'commentId';
+      const requestPayload = {
+        userId, threadId, commentId,
+      };
+      const server = await createServer(container);
+
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${threadId}/comments/${commentId}`,
+        payload: requestPayload,
+      });
+
+      const responseJSON = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(401);
+      expect(responseJSON.error).toEqual('Unauthorized');
+    });
+
+    it('should return 404 NotFoundError when given invalid value', async () => {
+      const badThreadId = 'thr-345';
+      const commentId = 'comment-123';
+      const userId = 'user-123';
+      const requestPayload = { userId, badThreadId, commentId };
+
+      const accessToken = await ServerTestHelper.getAccessToken({});
+      const server = await createServer(container);
+
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${badThreadId}/comments/${commentId}`,
+        payload: requestPayload,
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const responseJSON = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJSON.status).toEqual('fail');
+    });
+
+    it('should return 403 Forbidden when delete a comment that does not belong to the user', async () => {
+      const threadId = 'thread-123';
+      const commentId = 'comment-123';
+      const accessToken = await ServerTestHelper.getAccessToken(id = 'usr-345');
+      const server = await createServer(container);
+
+      await UsersTableTestHelper.addUser({
+        id: 'usr-345',
+        username: 'dicodingid',
+        password: 'secret',
+        fullname: 'Dicoding Indonesia',
+      });
+
+      await ThreadsTableTestHelper.addThread({
+        id: 'thread-123',
+        title: 'test title',
+        body: 'test body',
+        owner: 'usr-345',
+      });
+
+      await CommentsTableTestHelper.addComment({
+        id: 'comment-123',
+        threadId: 'thread-123',
+        owner: 'usr-345',
+        content: 'a comment',
+      });
+
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${threadId}/comments/${commentId}`,
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const responseJSON = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(403);
+      expect(responseJSON.message).toEqual('Comment does not belong to the user');
+    });
+
+    it('should return 200 when succesfully update is_delete to be true', async () => {
+      const threadId = 'thread-123';
+      const commentId = 'comment-123';
+      const accessToken = await ServerTestHelper.getAccessToken({});
+      const server = await createServer(container);
+
+      await ThreadsTableTestHelper.addThread({
+        id: 'thread-123',
+        title: 'test title',
+        body: 'test body',
+        owner: 'user-123',
+      });
+
+      await CommentsTableTestHelper.addComment({
+        id: 'comment-123',
+        threadId: 'thread-123',
+        owner: 'user-123',
+        content: 'a comment',
+      });
+
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${threadId}/comments/${commentId}`,
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const responseJSON = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(200);
+      expect(responseJSON.status).toEqual('success');
+    });
+  });
 });

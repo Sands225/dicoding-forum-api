@@ -9,7 +9,7 @@ const CommentsTableTestHelper = {
     content = 'a comment',
   }) {
     const query = {
-      text: 'INSERT INTO comments VALUES($1, $2, $3, $4) RETURNING id, threadId, owner, content',
+      text: 'INSERT INTO comments VALUES($1, $2, $3, $4) RETURNING id, thread_id, owner, content',
       values: [id, threadId, owner, content],
     };
 
