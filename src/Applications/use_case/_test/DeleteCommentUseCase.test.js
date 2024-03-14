@@ -35,9 +35,13 @@ describe('DeleteCommentUseCase', () => {
     await deleteCommentUseCase.execute(useCasePayload);
 
     // Arrange
-    await expect(deleteCommentUseCase.execute(useCasePayload)).resolves.not.toThrowError;
-    expect(mockThreadRepository.checkThreadId).toBeCalledWith(threadId);
-    expect(mockCommentRepository.checkCommentOwner).toBeCalledWith(userId, commentId);
-    expect(mockCommentRepository.deleteComment).toBeCalledWith(commentId);
+    await expect(deleteCommentUseCase.execute(useCasePayload))
+      .resolves.not.toThrowError;
+    expect(mockThreadRepository.checkThreadId)
+      .toBeCalledWith(threadId);
+    expect(mockCommentRepository.checkCommentOwner)
+      .toBeCalledWith(userId, commentId);
+    expect(mockCommentRepository.deleteComment)
+      .toBeCalledWith(commentId);
   });
 });

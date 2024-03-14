@@ -217,4 +217,41 @@ describe('CommentRepositoryPostgres', () => {
       expect(getComments[0].is_delete).toEqual(false);
     });
   });
+
+  describe('checkCommentId', () => {
+    it('should return not found error when given invalid comment id', async () => {
+      const commentId = 'xxx';
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool);
+
+      await expect(commentRepositoryPostgres.checkCommentId(commentId))
+        .rejects.toThrow(NotFoundError);
+    });
+
+    it('should not return any error when given valid comment id', async () => {
+      await UsersTableTestHelper.addUser({
+        id: 'user-123',
+        username: 'dicoding',
+        password: 'encrypted-password',
+        fullname: 'Dicoding Indonesia',
+      });
+      await ThreadsTableTestHelper.addThread({
+        id: 'thread-123',
+        title: 'test title',
+        body: 'test body',
+        owner: 'user-123',
+      });
+      await CommentsTableTestHelper.addComment({
+        id: 'comment-123',
+        threadId: 'thread-123',
+        owner: 'user-123',
+        content: 'a comment',
+      });
+      const commentId = 'comment-123';
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool);
+
+      await expect(commentRepositoryPostgres
+        .checkCommentId(commentId))
+        .resolves.not.toThrow(NotFoundError);
+    });
+  });
 });
