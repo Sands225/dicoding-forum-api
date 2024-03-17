@@ -140,4 +140,25 @@ describe('ReplyRepositoryPostgres', () => {
       expect(replies[0].is_delete).toEqual(true);
     });
   });
+
+  describe('getReplies', () => {
+    it('should return replies correctly from given threadId', async () => {
+      await RepliesTableTestHelper.addReply({
+        id: 'reply-123',
+        commentId: 'comment-123',
+        owner: 'user-123',
+        content: 'a thread reply',
+      });
+      const threadId = 'thread-123';
+
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool);
+      const result = await replyRepositoryPostgres.getReplies(threadId);
+
+      expect(result[0].id).toEqual('reply-123');
+      expect(result[0].content).toEqual('a thread reply');
+      expect(result[0].commentid).toEqual('comment-123');
+      expect(result[0].username).toEqual('dicoding');
+      expect(result[0].isdelete).toEqual(false);
+    });
+  });
 });

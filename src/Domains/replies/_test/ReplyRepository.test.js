@@ -14,5 +14,7 @@ describe('ThreadRepository interface', () => {
     await expect(replyRespository.checkReplyId({})).rejects.toThrowError('REPLY_REPOSITORY.METHOD_NOT_IMPLEMENTED');
 
     await expect(replyRespository.checkReplyOwner({})).rejects.toThrowError('REPLY_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+
+    await expect(replyRespository.getReplies({})).rejects.toThrowError('REPLY_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   });
 });

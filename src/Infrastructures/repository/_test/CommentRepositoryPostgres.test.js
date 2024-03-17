@@ -214,7 +214,7 @@ describe('CommentRepositoryPostgres', () => {
       expect(getComments[0].username).toEqual('dicoding');
       expect(getComments[0].date).toBeTruthy();
       expect(getComments[0].content).toEqual('a comment');
-      expect(getComments[0].is_delete).toEqual(false);
+      expect(getComments[0].isdelete).toEqual(false);
     });
   });
 

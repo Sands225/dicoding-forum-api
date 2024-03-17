@@ -1,11 +1,12 @@
 /* eslint-disable no-undef */
 const pool = require('../../database/postgres/pool');
-const ServerTestHelper = require('../../../../tests/ServerTesthelper');
+const ServerTestHelper = require('../../../../tests/ServerTestHelper');
 const container = require('../../container');
 const createServer = require('../createServer');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
+const RepliesTableTestHelper = require('../../../../tests/RepliesTableTestHelper');
 
 describe('/threads endpoint', () => {
   afterAll(async () => {
@@ -155,6 +156,12 @@ describe('/threads endpoint', () => {
         threadId: 'thread-123',
         owner: 'user-123',
         content: 'first comment',
+      });
+      await RepliesTableTestHelper.addReply({
+        id: 'reply-123',
+        commentId: 'comment-123',
+        owner: 'user-123',
+        content: 'a thread reply',
       });
 
       const server = await createServer(container);

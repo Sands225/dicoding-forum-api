@@ -36,7 +36,7 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     }
   }
 
-  async getDetailThread(threadId, comments) {
+  async getDetailThread(threadId) {
     const query = {
       text: `SELECT threads.id AS id, 
                     threads.title AS title,
@@ -56,7 +56,6 @@ class ThreadRepositoryPostgres extends ThreadRepository {
       body: getThread.rows[0].body,
       date: getThread.rows[0].date,
       username: getThread.rows[0].username,
-      comments,
     };
     return detailThread;
   }

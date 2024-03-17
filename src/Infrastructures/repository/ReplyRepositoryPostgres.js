@@ -52,6 +52,25 @@ class ReplyRepositoryPostgres extends ReplyRepository {
       throw new AuthorizationError('reply does not belong to user');
     }
   }
+
+  async getReplies(threadId) {
+    const query = {
+      text: `SELECT replies.id AS id, 
+                    replies.content AS content, 
+                    replies.date AS date, 
+                    replies.comment_id AS commentId,
+                    users.username AS username, 
+                    replies.is_delete AS isDelete
+            FROM replies
+            INNER JOIN users ON replies.owner = users.id
+            INNER JOIN comments ON replies.comment_id = comments.id 
+            WHERE comments.thread_id = $1
+            ORDER BY replies.date ASC`,
+      values: [threadId],
+    };
+    const result = await this._pool.query(query);
+    return result.rows;
+  }
 }
 
 module.exports = ReplyRepositoryPostgres;
